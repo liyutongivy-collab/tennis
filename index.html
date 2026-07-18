@@ -372,7 +372,6 @@
         <label id="codeLabel" for="codeInput">Player code</label>
         <input class="code-input" id="codeInput" inputmode="numeric" maxlength="6" placeholder="4-digit code" autocomplete="off">
         <button class="lg-btn" id="enterBtn" onclick="doLogin()">Enter</button>
-        <p class="lg-hint" id="loginHint">Demo — player 1234 · coach 8888</p>
       </div>
     </div>
   </div>
@@ -467,7 +466,7 @@ const EN={
   duoCap:'Coaching · Scheduling',
   segStu:'Player', segAdm:'Coach',
   codeLabelStu:'Player code', codeLabelAdm:'Coach PIN', codePh:'4-digit code',
-  enter:'Enter', hint:'Demo — player 1234 · coach 8888',
+  enter:'Enter',
   needCodeStu:'Enter your player code', needCodeAdm:'Enter the coach PIN',
   pinWrong:'That PIN doesn’t match', codeNotFound:'Code not found — ask your coach',
   hiCoach:'Welcome back, coach', hiPlayer:n=>'Welcome back, '+n,
@@ -578,7 +577,7 @@ const ZH={
   duoCap:'教练 · 课务',
   segStu:'学员', segAdm:'教练端',
   codeLabelStu:'学员码', codeLabelAdm:'教练密码', codePh:'4 位数字',
-  enter:'进入', hint:'演示 — 学员码 1234 · 教练密码 8888',
+  enter:'进入',
   needCodeStu:'请输入学员码', needCodeAdm:'请输入教练密码',
   pinWrong:'密码不对哦', codeNotFound:'没找到这个学员码，问问教练',
   hiCoach:'欢迎回来，教练', hiPlayer:n=>'欢迎回来，'+n,
@@ -696,7 +695,6 @@ function applyLangStatic(){
   $('codeLabel').textContent = loginMode==='student'?T.codeLabelStu:T.codeLabelAdm;
   $('codeInput').placeholder=T.codePh;
   $('enterBtn').textContent=T.enter;
-  $('loginHint').textContent=T.hint;
   $('btnToday').textContent=T.btnToday;
   $('vtWeek').textContent=T.vtWeek;
   $('vtMonth').textContent=T.vtMonth;
