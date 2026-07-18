@@ -1,0 +1,1383 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MAX TENNIS — Court time, sorted</title>
+<style>
+  :root{
+    --paper:#EFEEE6;
+    --card:#FFFFFF;
+    --card-2:#E9E9DE;
+    --ink:#13211A;
+    --muted:#6B776D;
+    --faint:#9AA49A;
+    --line:#E0E1D5;
+    --green:#123526;
+    --green-2:#1D5C40;
+    --green-ink:#F5F7EE;
+    --green-soft:#E3ECE3;
+    --ball:#D9E45A;
+    --ball-ink:#25300A;
+    --amber:#96681E;
+    --amber-soft:#F4EAD3;
+    --blue:#33607F;
+    --blue-soft:#E1EBF2;
+    --red:#A03B30;
+    --red-soft:#F5E2DF;
+    --glass:rgba(255,255,255,.88);
+    --shadow:0 18px 40px rgba(18,53,38,.16);
+    --shadow-sm:0 3px 12px rgba(19,33,26,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#10140F; --card:#1A1F19; --card-2:#242A22; --ink:#EBEEE4;
+      --muted:#9AA595; --faint:#6C766A; --line:#2A3128;
+      --green:#0F2E21; --green-2:#237A54; --green-ink:#F0F4E8; --green-soft:#20302547;
+      --ball:#D3E04A; --ball-ink:#1F2906;
+      --amber:#D8A957; --amber-soft:#322A18;
+      --blue:#8CB6D4; --blue-soft:#1D2A34;
+      --red:#D78B81; --red-soft:#35211F;
+      --glass:rgba(18,24,18,.82);
+      --shadow:0 18px 40px rgba(0,0,0,.5); --shadow-sm:0 3px 12px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#EFEEE6; --card:#FFFFFF; --card-2:#E9E9DE; --ink:#13211A;
+    --muted:#6B776D; --faint:#9AA49A; --line:#E0E1D5;
+    --green:#123526; --green-2:#1D5C40; --green-ink:#F5F7EE; --green-soft:#E3ECE3;
+    --ball:#D9E45A; --ball-ink:#25300A;
+    --amber:#96681E; --amber-soft:#F4EAD3; --blue:#33607F; --blue-soft:#E1EBF2;
+    --red:#A03B30; --red-soft:#F5E2DF; --glass:rgba(255,255,255,.88);
+    --shadow:0 18px 40px rgba(18,53,38,.16); --shadow-sm:0 3px 12px rgba(19,33,26,.07);
+  }
+  :root[data-theme="dark"]{
+    --paper:#10140F; --card:#1A1F19; --card-2:#242A22; --ink:#EBEEE4;
+    --muted:#9AA595; --faint:#6C766A; --line:#2A3128;
+    --green:#0F2E21; --green-2:#237A54; --green-ink:#F0F4E8; --green-soft:#20302547;
+    --ball:#D3E04A; --ball-ink:#1F2906;
+    --amber:#D8A957; --amber-soft:#322A18; --blue:#8CB6D4; --blue-soft:#1D2A34;
+    --red:#D78B81; --red-soft:#35211F; --glass:rgba(18,24,18,.82);
+    --shadow:0 18px 40px rgba(0,0,0,.5); --shadow-sm:0 3px 12px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  html,body{margin:0; padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",sans-serif;
+    font-size:15px; line-height:1.55;
+  }
+  .serif{font-family:Georgia,"Times New Roman","Songti SC",serif; letter-spacing:-.01em}
+  .wrap{width:100%; max-width:430px; margin:0 auto}
+  button{font-family:inherit}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--green-2); outline-offset:2px}
+  img{display:block}
+  .hidden{display:none !important}
+
+  .eyebrow{font-size:10.5px; font-weight:700; letter-spacing:.3em; text-transform:uppercase}
+  .lang-pill{
+    border:1px solid rgba(251,252,245,.4); background:rgba(251,252,245,.1); color:#F3F5EA;
+    border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:700; cursor:pointer;
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+
+  /* ================= login ================= */
+  #login{position:relative; min-height:100svh; overflow:hidden; background:#0D1F17; color:#F3F5EA}
+  #login .bg{position:absolute; inset:0}
+  #login .bg img{
+    width:100%; height:100%; object-fit:cover; object-position:center 20%;
+    filter:blur(9px) saturate(1.05) brightness(.85); transform:scale(1.12);
+  }
+  #login .bg::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(10,25,18,.42) 0%, rgba(10,25,18,.28) 34%, rgba(9,22,16,.78) 72%, rgba(8,19,14,.94) 100%);
+  }
+  .lg{position:relative; min-height:100svh; display:flex; flex-direction:column; padding:0 24px}
+  .lg-top{padding-top:max(54px, env(safe-area-inset-top)); display:flex; justify-content:center; position:relative}
+  .lg-top .eyebrow{color:rgba(243,245,234,.9); padding-top:5px}
+  .lg-top .lang-pill{position:absolute; right:0; top:max(50px, env(safe-area-inset-top))}
+  .lg-mid{margin-top:auto; padding-top:56px}
+  .lg-mid h1{
+    margin:0 0 10px; font-size:44px; line-height:1.12; font-weight:400; color:#FBFCF5; text-wrap:balance;
+  }
+  .lg-mid h1 em{font-style:italic; color:var(--ball)}
+  .lg-mid p{margin:0 0 20px; font-size:14px; color:rgba(233,238,222,.78); max-width:30ch}
+  .duo{display:flex; align-items:center; gap:10px; margin-bottom:20px}
+  .duo .faces{display:flex}
+  .face{width:44px; height:44px; border-radius:50%; overflow:hidden; border:2px solid rgba(251,252,245,.85); background:#2A3A30}
+  .face + .face{margin-left:-12px}
+  .face img{width:100%; height:100%; object-fit:cover}
+  .face.c img{object-position:center 18%}
+  .duo span{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:rgba(233,238,222,.66); font-weight:600}
+  .lg-card{
+    background:var(--glass); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,.16); border-radius:22px; padding:18px 18px 16px;
+    box-shadow:0 24px 60px rgba(0,0,0,.35); color:var(--ink);
+    margin-bottom:max(26px, env(safe-area-inset-bottom));
+  }
+  .seg{display:grid; grid-template-columns:1fr 1fr; background:var(--card-2); border-radius:13px; padding:4px; gap:4px; margin-bottom:14px}
+  .seg button{
+    border:none; border-radius:10px; padding:10px 0; cursor:pointer; background:transparent; color:var(--muted);
+    font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  }
+  .seg button.on{background:var(--green); color:var(--green-ink)}
+  .lg-card label{font-size:12px; font-weight:700; color:var(--muted); display:block; margin:2px 0 7px}
+  .code-input{
+    width:100%; border:1.5px solid var(--line); border-radius:13px; background:var(--card);
+    padding:13px; font-size:19px; letter-spacing:.4em; text-align:center; font-weight:700; color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .code-input::placeholder{letter-spacing:.05em; font-size:13.5px; font-weight:500; color:var(--faint)}
+  .lg-btn{
+    width:100%; margin-top:12px; border:none; border-radius:13px; padding:14px 0; cursor:pointer;
+    background:var(--ball); color:var(--ball-ink); font-size:13px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  }
+  .lg-hint{margin:12px 0 0; font-size:11.5px; color:var(--muted); text-align:center}
+
+  /* ================= app hero ================= */
+  .hero{position:relative; overflow:hidden; color:#F3F5EA; border-radius:0 0 26px 26px}
+  .hero .bg{position:absolute; inset:0}
+  .hero .bg img{width:100%; height:100%; object-fit:cover; object-position:center 18%; filter:blur(12px) brightness(.8); transform:scale(1.2)}
+  .hero .bg::after{content:""; position:absolute; inset:0;
+    background:linear-gradient(160deg, rgba(13,38,27,.86) 8%, rgba(13,38,27,.62) 55%, rgba(10,28,20,.9) 100%)}
+  .hero-in{position:relative; padding:max(20px, env(safe-area-inset-top)) 20px 18px}
+  .hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
+  .hero .eyebrow{color:rgba(217,228,90,.95); font-size:10px}
+  .hero h1{margin:7px 0 3px; font-size:29px; font-weight:400; color:#FCFDF6; line-height:1.18}
+  .hero .sub{margin:0; font-size:12.5px; color:rgba(233,238,222,.72)}
+  .hero .faces{display:flex; margin-top:4px}
+  .hero .face{width:38px; height:38px; border-width:2px}
+  .hero-chips{display:flex; gap:7px; margin-top:16px; flex-wrap:wrap}
+  .hchip{
+    background:rgba(250,252,244,.13); border:1px solid rgba(250,252,244,.2); color:#EFF4E4;
+    border-radius:999px; padding:5px 12px; font-size:12px; font-weight:600;
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  }
+  .hchip.ball{background:var(--ball); border-color:var(--ball); color:var(--ball-ink); font-weight:800}
+
+  #appBody{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+
+  /* ================= calendar ================= */
+  .cal-head{display:flex; align-items:center; justify-content:space-between; padding:18px 20px 6px}
+  .cal-head .month{font-size:19px; font-variant-numeric:tabular-nums}
+  .cal-tools{display:flex; gap:6px; align-items:center}
+  .cal-tools button{
+    height:30px; border-radius:10px; border:1px solid var(--line); background:var(--card);
+    color:var(--ink); font-size:14px; cursor:pointer; padding:0 10px;
+  }
+  .cal-tools .vt{font-size:10.5px; font-weight:800; letter-spacing:.1em; color:var(--muted); text-transform:uppercase}
+  .cal-tools .vt.on{background:var(--green); border-color:var(--green); color:var(--green-ink)}
+  .wd-row{display:grid; grid-template-columns:repeat(7,1fr); padding:4px 16px 0; gap:4px}
+  .wd-row span{text-align:center; font-size:10px; color:var(--faint); font-weight:700; letter-spacing:.08em}
+  .grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:2px 16px 8px}
+  .cell{border:none; background:transparent; border-radius:12px; cursor:pointer; color:var(--ink);
+    padding:6px 0 5px; display:flex; flex-direction:column; align-items:center; gap:2px}
+  .cell .num{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:600; font-variant-numeric:tabular-nums}
+  .cell.today .num{box-shadow:inset 0 0 0 1.5px var(--green-2)}
+  .cell.sel .num{background:var(--green); color:var(--green-ink)}
+  .cell.dim{opacity:.32}
+  .cell .marks{height:5px; display:flex; gap:3px}
+  .cell .marks i{width:4.5px; height:4.5px; border-radius:50%; background:var(--green-2)}
+  .cell .marks i.p{background:var(--amber)}
+
+  /* ================= day list ================= */
+  main{padding:0 16px}
+  .day-title{display:flex; align-items:baseline; gap:9px; padding:12px 6px 10px}
+  .day-title h2{margin:0; font-size:19px; font-weight:400}
+  .day-title span{font-size:11px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; font-weight:700}
+  .lesson{
+    background:var(--card); border-radius:18px; padding:14px 16px; margin-bottom:9px; cursor:pointer;
+    display:flex; gap:14px; align-items:stretch; box-shadow:var(--shadow-sm);
+  }
+  .lesson .time{display:flex; flex-direction:column; justify-content:center; min-width:56px; font-variant-numeric:tabular-nums}
+  .lesson .time b{font-size:19px; font-weight:400; font-family:Georgia,"Times New Roman",serif}
+  .lesson .time span{font-size:11.5px; color:var(--muted)}
+  .lesson .bar{width:3.5px; border-radius:4px; background:var(--green-2); flex:none}
+  .lesson.pending .bar{background:var(--amber)}
+  .lesson.locked .bar{background:var(--line)}
+  .lesson .info{flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px}
+  .lesson .who{font-weight:700; font-size:15px; display:flex; align-items:center; gap:7px; flex-wrap:wrap}
+  .lesson .where{font-size:13px; color:var(--muted); display:flex; align-items:center; gap:5px}
+  .lesson .where svg{flex:none}
+  .lesson.locked{cursor:default; background:transparent; box-shadow:none; border:1px dashed var(--line)}
+  .lesson.locked .who{color:var(--muted); font-weight:500}
+  .pill{font-size:10px; font-weight:800; padding:3px 9px; border-radius:999px; white-space:nowrap; letter-spacing:.06em; text-transform:uppercase}
+  .pill.ok{background:var(--green-soft); color:var(--green-2)}
+  .pill.wait{background:var(--amber-soft); color:var(--amber)}
+  .pill.chg{background:var(--blue-soft); color:var(--blue)}
+  .pill.no{background:var(--red-soft); color:var(--red)}
+  .pill.hrs{background:var(--card-2); color:var(--muted)}
+  .empty{text-align:center; color:var(--faint); padding:38px 0 26px; font-size:13px}
+  .empty b{display:block; font-size:17px; color:var(--muted); font-weight:400; margin-bottom:4px; font-family:Georgia,"Songti SC",serif}
+
+  /* ================= requests / cards ================= */
+  .sec-title{font-size:10.5px; font-weight:800; color:var(--muted); letter-spacing:.18em; text-transform:uppercase; margin:20px 6px 8px}
+  .req{background:var(--card); border-radius:18px; padding:15px 16px; margin-bottom:9px; box-shadow:var(--shadow-sm)}
+  .req .head{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px}
+  .req .head b{font-size:15.5px}
+  .req .body{font-size:13.5px; color:var(--muted); line-height:1.7}
+  .req .body .arrow{color:var(--ink); font-weight:700}
+  .acts{display:flex; gap:9px; margin-top:12px}
+  .btn{
+    border-radius:12px; padding:11px 4px; flex:1; text-align:center; font-size:12px; font-weight:800;
+    letter-spacing:.08em; text-transform:uppercase;
+    border:1.5px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer;
+  }
+  .btn.primary{background:var(--green); border-color:var(--green); color:var(--green-ink)}
+  .btn.ball{background:var(--ball); border-color:var(--ball); color:var(--ball-ink)}
+  .btn.danger{color:var(--red); border-color:var(--red-soft); background:var(--red-soft)}
+
+  /* ================= players ================= */
+  .stu{background:var(--card); border-radius:18px; padding:13px 16px; margin-bottom:9px; cursor:pointer;
+    display:flex; align-items:center; gap:13px; box-shadow:var(--shadow-sm)}
+  .stu .badge-face{width:42px; height:42px; border-radius:50%; background:var(--green-soft); color:var(--green-2);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; flex:none}
+  .stu .mid{flex:1; min-width:0}
+  .stu .mid b{font-size:15.5px; display:block}
+  .stu .mid span{font-size:12.5px; color:var(--muted)}
+  .stu .bal{text-align:right}
+  .stu .bal b{font-size:22px; font-weight:400; font-family:Georgia,serif; font-variant-numeric:tabular-nums; display:block; line-height:1.15}
+  .stu .bal b.low{color:var(--red)}
+  .stu .bal span{font-size:10px; color:var(--faint); letter-spacing:.08em; text-transform:uppercase; font-weight:700}
+  .add-line{width:100%; border:1.5px dashed var(--line); background:transparent; color:var(--muted);
+    border-radius:18px; padding:14px 0; font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; cursor:pointer; margin-bottom:10px}
+
+  /* ================= profile ================= */
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-bottom:13px}
+  .stat{background:var(--card); border-radius:18px; padding:15px 0 12px; text-align:center; box-shadow:var(--shadow-sm)}
+  .stat b{display:block; font-size:26px; font-weight:400; font-family:Georgia,serif; font-variant-numeric:tabular-nums}
+  .stat span{font-size:10px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; font-weight:700}
+  .card{background:var(--card); border-radius:18px; padding:4px 16px; margin-bottom:13px; box-shadow:var(--shadow-sm)}
+  .row{display:flex; justify-content:space-between; align-items:center; padding:13px 0; gap:12px}
+  .row + .row{border-top:1px solid var(--line)}
+  .row .l{font-size:14.5px; font-weight:600}
+  .row .r{font-size:14px; color:var(--muted); display:flex; align-items:center; gap:6px; text-align:right}
+  .row.click{cursor:pointer}
+
+  /* ================= tabbar / fab ================= */
+  nav{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:0; z-index:20;
+    width:100%; max-width:430px;
+    background:var(--glass);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border-top:1px solid var(--line); display:flex;
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+  nav button{
+    background:none; border:none; cursor:pointer; flex:1;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--faint); padding:4px 0; position:relative; font-weight:800;
+  }
+  nav button.on{color:var(--green-2)}
+  :root[data-theme="dark"] nav button.on{color:var(--ball)}
+  nav svg{width:22px; height:22px}
+  nav .badge{
+    position:absolute; top:-2px; right:calc(50% - 22px);
+    background:var(--red); color:#fff; font-size:10px; font-weight:800;
+    min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px;
+  }
+  .fab{
+    position:fixed; right:max(16px, calc(50vw - 215px + 16px)); bottom:calc(84px + env(safe-area-inset-bottom)); z-index:21;
+    background:var(--ball); color:var(--ball-ink); border:none; cursor:pointer;
+    border-radius:999px; padding:15px 22px 15px 18px; font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px; box-shadow:0 12px 26px rgba(80,95,0,.35);
+  }
+
+  /* ================= sheet ================= */
+  .overlay{
+    position:fixed; inset:0; background:rgba(8,16,11,.55); z-index:60;
+    display:flex; justify-content:center; align-items:flex-end;
+    opacity:0; pointer-events:none; transition:opacity .2s;
+  }
+  .overlay.show{opacity:1; pointer-events:auto}
+  .sheet{
+    width:100%; max-width:430px; background:var(--card);
+    border-radius:22px 22px 0 0; padding:10px 20px calc(26px + env(safe-area-inset-bottom));
+    max-height:88vh; overflow-y:auto; transform:translateY(30px); transition:transform .22s ease;
+  }
+  .overlay.show .sheet{transform:translateY(0)}
+  @media (prefers-reduced-motion: reduce){ .overlay,.overlay .sheet{transition:none} }
+  .grip{width:38px; height:4px; border-radius:3px; background:var(--line); margin:5px auto 15px}
+  .sheet h3{margin:0 0 4px; font-size:21px; font-weight:400; font-family:Georgia,"Songti SC",serif}
+  .sheet .sub{margin:0 0 14px; font-size:13px; color:var(--muted)}
+  .f-label{font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:15px 0 6px; display:block}
+  .f-input,.f-select{
+    width:100%; border:1.5px solid var(--line); border-radius:12px; background:var(--paper);
+    padding:12px; font-size:15px; color:var(--ink); font-family:inherit; appearance:none;
+  }
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+    border-radius:999px; padding:9px 15px; font-size:13px; cursor:pointer; font-weight:600}
+  .chip.on{background:var(--green); border-color:var(--green); color:var(--green-ink); font-weight:700}
+  .slot-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:7px}
+  .slot{
+    border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+    border-radius:10px; padding:10px 0; text-align:center; font-size:13px; font-weight:700;
+    cursor:pointer; font-variant-numeric:tabular-nums;
+  }
+  .slot.taken{background:var(--card-2); color:var(--faint); text-decoration:line-through; cursor:default; border-color:transparent; font-weight:500}
+  .slot.on{background:var(--green); border-color:var(--green); color:var(--green-ink)}
+  .slot-legend{display:flex; gap:14px; margin:8px 2px 0; font-size:11.5px; color:var(--faint)}
+  .mini-slots{display:flex; flex-wrap:wrap; gap:7px; padding:0 6px 10px}
+  .mini-slot{
+    border:1.5px dashed var(--line); color:var(--muted); background:transparent;
+    border-radius:999px; padding:6px 13px; font-size:12.5px; font-weight:700; cursor:pointer;
+    font-variant-numeric:tabular-nums;
+  }
+  .mini-slot:active{background:var(--green-soft)}
+  .kv{display:flex; justify-content:space-between; gap:14px; padding:11px 0; border-bottom:1px solid var(--line); font-size:14.5px}
+  .kv:last-of-type{border-bottom:none}
+  .kv .k{color:var(--muted); flex:none}
+  .kv .v{text-align:right; font-weight:600}
+  .note-box{border-radius:13px; padding:11px 14px; font-size:13.5px; line-height:1.65; margin:12px 0 2px}
+  .note-box.chg{background:var(--blue-soft); color:var(--blue)}
+  .note-box.cxl{background:var(--red-soft); color:var(--red)}
+  .note-box.warn{background:var(--amber-soft); color:var(--amber)}
+  .balance-tip{display:flex; justify-content:space-between; align-items:center;
+    background:var(--green-soft); border-radius:13px; padding:11px 14px; margin-top:15px; font-size:13.5px; font-weight:700; color:var(--green-2)}
+
+  .toast{
+    position:fixed; left:50%; bottom:118px; transform:translateX(-50%) translateY(8px);
+    background:var(--ink); color:var(--paper); font-size:13px; font-weight:600;
+    padding:11px 19px; border-radius:999px; z-index:90; opacity:0; transition:all .25s; pointer-events:none;
+    max-width:82vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+
+<!-- ================= LOGIN ================= -->
+<div id="login" class="hidden">
+  <div class="bg"><img src="max-hero.jpg" alt=""></div>
+  <div class="lg wrap">
+    <div class="lg-top">
+      <span class="eyebrow">Max Tennis Club</span>
+      <button class="lang-pill" id="langPillLogin" onclick="toggleLang()">中文</button>
+    </div>
+    <div class="lg-mid">
+      <h1 class="serif" id="lgH1">Court time,<br><em>sorted.</em></h1>
+      <p id="lgSub">Book sessions, reschedule and track your credits — all in one place.</p>
+      <div class="duo">
+        <div class="faces">
+          <div class="face"><img src="max-avatar.jpg" alt="Coach"></div>
+          <div class="face c"><img src="cindy-avatar.jpg" alt="Scheduler"></div>
+        </div>
+        <span id="duoCap">Coaching · Scheduling</span>
+      </div>
+      <div class="lg-card">
+        <div class="seg">
+          <button id="segStu" class="on" onclick="setLoginMode('student')">Player</button>
+          <button id="segAdm" onclick="setLoginMode('admin')">Coach</button>
+        </div>
+        <label id="codeLabel" for="codeInput">Player code</label>
+        <input class="code-input" id="codeInput" inputmode="numeric" maxlength="6" placeholder="4-digit code" autocomplete="off">
+        <button class="lg-btn" id="enterBtn" onclick="doLogin()">Enter</button>
+        <p class="lg-hint" id="loginHint">Demo — player 1234 · coach 8888</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app" class="hidden">
+  <div class="wrap" id="appBody">
+    <header class="hero">
+      <div class="bg"><img src="max-hero.jpg" alt=""></div>
+      <div class="hero-in">
+        <div class="hero-top">
+          <div>
+            <div class="eyebrow" id="heroEyebrow">Schedule</div>
+            <h1 class="serif" id="heroTitle"></h1>
+            <p class="sub" id="heroSub"></p>
+          </div>
+          <div class="faces">
+            <div class="face"><img src="max-avatar.jpg" alt=""></div>
+            <div class="face c"><img src="cindy-avatar.jpg" alt=""></div>
+          </div>
+        </div>
+        <div class="hero-chips" id="heroChips"></div>
+      </div>
+    </header>
+
+    <div id="viewSchedule">
+      <div class="cal-head">
+        <div class="month serif" id="monthLabel"></div>
+        <div class="cal-tools">
+          <button onclick="shiftCal(-1)" aria-label="Previous">‹</button>
+          <button id="btnToday" onclick="goToday()" style="font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted)">TODAY</button>
+          <button onclick="shiftCal(1)" aria-label="Next">›</button>
+          <button class="vt" id="vtWeek" onclick="setCalMode('week')">Wk</button>
+          <button class="vt" id="vtMonth" onclick="setCalMode('month')">Mo</button>
+        </div>
+      </div>
+      <div class="wd-row" id="wdRow"></div>
+      <div class="grid" id="calGrid"></div>
+      <main>
+        <div class="day-title"><h2 class="serif" id="dayTitle"></h2><span id="dayCount"></span></div>
+        <div id="lessonList"></div>
+      </main>
+    </div>
+
+    <div id="viewRequests" class="hidden"><main id="reqList" style="padding-top:4px"></main></div>
+    <div id="viewStudents" class="hidden"><main id="stuList" style="padding-top:12px"></main></div>
+    <div id="viewProfile" class="hidden"><main id="profileMain" style="padding-top:12px"></main></div>
+  </div>
+
+  <button class="fab" id="fab" onclick="openBookSheet()">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <span id="fabText">Book</span>
+  </button>
+
+  <nav id="tabbar"></nav>
+
+  <div class="overlay" id="overlay" onclick="if(event.target===this) closeSheet()">
+    <div class="sheet" id="sheetBody" role="dialog" aria-modal="true"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+'use strict';
+/* ================= config ================= */
+const KEY='maxtennis_v3';
+/* Supabase cloud storage (single-row app_state table). */
+const SB_URL='https://wtsfbyhmzvdwqvapnjkh.supabase.co';
+const SB_KEY='sb_publishable_wbKvHCSsFAg0jsIz-GgtQQ_eUnatQp-';
+const SB_ROW=SB_URL+'/rest/v1/app_state?id=eq.1';
+const SB_HEADERS={apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json'};
+const CLOUD=!!SB_URL;
+const SESSION_KEY='mt_session_v1';
+const LANG_KEY='mt_lang';
+const ADMIN_PIN_DEFAULT='8888';
+const LOC_DEFAULTS=['憨牛网球 浦东店','至臻网球 虹口汶水店','亦新网球 闵行古北店','BP网球 杨浦店','超岛网球 杨浦店','绿洲网球 闵行店','北外滩网球运动中心 虹口'];
+
+/* ================= i18n ================= */
+let LANG='en';
+try{ LANG=localStorage.getItem(LANG_KEY)||'en'; }catch(e){}
+const EN={
+  wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+  wdHead:['MO','TU','WE','TH','FR','SA','SU'],
+  mo:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  monthLabel:(y,m)=>EN.mo[m]+' '+y,
+  dateLabel:(d,pre)=>pre+EN.wd[d.getDay()]+', '+EN.mo[d.getMonth()]+' '+d.getDate(),
+  today:'Today', tomorrow:'Tomorrow',
+  langPill:'中文',
+  lgH1:'Court time,<br><em>sorted.</em>',
+  lgSub:'Book sessions, reschedule and track your credits — all in one place.',
+  duoCap:'Coaching · Scheduling',
+  segStu:'Player', segAdm:'Coach',
+  codeLabelStu:'Player code', codeLabelAdm:'Coach PIN', codePh:'4-digit code',
+  enter:'Enter', hint:'Demo — player 1234 · coach 8888',
+  needCodeStu:'Enter your player code', needCodeAdm:'Enter the coach PIN',
+  pinWrong:'That PIN doesn’t match', codeNotFound:'Code not found — ask your coach',
+  hiCoach:'Welcome back, coach', hiPlayer:n=>'Welcome back, '+n,
+  syncFail:'Sync failed — check your connection and retry',
+  serverFail:'Could not reach the server — check your connection',
+  tabSchedule:'Schedule', tabInbox:'Inbox', tabPlayers:'Players', tabMe:'Me',
+  fabBook:'Book', fabAdd:'Add', fabNewPlayer:'New player',
+  eyebrowCoach:'Coach console', eyebrowStu:'Schedule',
+  coachTitle:'The week, at a glance',
+  coachSub:'Confirm bookings, settle credits, keep the courts full',
+  stuSub:'Grab a slot before someone else does',
+  greet:()=>{const h=new Date().getHours(); return h<12?'Good morning':(h<18?'Good afternoon':'Good evening');},
+  chipToday:n=>'Today · '+n+' session'+(n===1?'':'s'),
+  chipReview:n=>'To review · '+n,
+  chipPlayers:n=>'Players · '+n,
+  chipCredits:n=>n+(n===1?' credit':' credits')+' left',
+  chipNext:s=>'Next · '+s, chipNoNext:'No upcoming session',
+  btnToday:'TODAY', vtWeek:'Wk', vtMonth:'Mo',
+  nSessions:n=>n+(n===1?' session':' sessions'),
+  credits:n=>n+(n===1?' credit':' credits'),
+  crPill:n=>n+' cr',
+  pillCancelReq:'Cancel requested', pillReschedule:'Reschedule', pillPending:'Pending', pillSettle:'Settle', pillConfirmed:'Confirmed', pillCancel:'Cancel',
+  booked:'Booked',
+  emptyDayTitle:'Nothing on this day',
+  emptyDayAdm:'Tap a slot below or “Add” to schedule',
+  emptyDayStu:'Open courts — tap a slot below to claim it',
+  openSlotsTitle:'Open slots · tap to book',
+  fullyBookedDay:'Fully booked — try another day',
+  secBookings:'Booking requests', secReschedules:'Reschedules', secCancels:'Cancellations', secSettle:'Completed — settle credits',
+  decline:'Decline', confirm:'Confirm', withdraw:'Withdraw',
+  keepOriginal:'Keep original', approve:'Approve',
+  keepSession:'Keep session',
+  markDone:n=>'Mark done · −'+n+' credit'+(n>1?'s':''),
+  note_:'Note: ', reason_:'Reason: ',
+  inboxEmptyTitle:'All caught up', inboxEmptySub:'Bookings, reschedules and cancellations land here',
+  codeWord:'Code', creditsWord:'credits',
+  newPlayerLine:'＋ New player profile',
+  statWeek:'This week', statHours:'Hours', statReview:'To review',
+  statCreditsLeft:'Credits left', statHoursDone:'Hours done', statUpcoming:'Upcoming',
+  rowSignedIn:'Signed in as', rowCoach:'Coach', rowChangePin:'Change coach PIN',
+  rowName:'Name', rowPlayerCode:'Player code', rowTotalCredits:'Total credits', topupsVia:' · top-ups via coach',
+  rowLang:'Language · 语言', rowLangVal:'English',
+  rowSignOut:'Sign out', rowReset:'Reset demo data',
+  bookTitleAdm:'Add a session', bookTitleStu:'Book a session',
+  bookSubAdm:'Goes straight onto the schedule as confirmed',
+  bookSubStu:'Sent to the coach for confirmation · courts run 8:00–21:00',
+  fPlayer:'Player', fDate:'Date', fDuration:'Duration',
+  dur1:'1 hr · 1 credit', dur2:'2 hrs · 2 credits',
+  pickTime:'Pick a time · ', nOpen:n=>n+' open', fullyBooked:'fully booked',
+  legendTap:'Tap an open time', legendTaken:'<s>Struck-through</s> = already booked',
+  fCourt:'Court · you book the venue, type it here', courtPh:'e.g. 憨牛网球 浦东店',
+  fNote:'Note · optional', notePh:'What to work on, court booked until…',
+  myCredits:'My credits',
+  cancel:'Cancel', sendRequest:'Send request', addToSchedule:'Add to schedule',
+  crLeft:n=>' ('+n+' cr left)',
+  tPickDate:'Pick a date', tPickSlot:'Pick an open time slot',
+  tTypeCourt:'Type the court name — book the venue first', tTypeCourt2:'Type the court name',
+  tLate:'Courts close at 21:00 — pick an earlier slot', tPast:'That date has already passed',
+  tNoCredits:'Not enough credits — ask your coach to top up', tTaken:'That slot is taken — try another time',
+  tAdded:'Added to the schedule', tSent:'Request sent — awaiting confirmation',
+  dSession:'Session', dSubPending:'Booking request awaiting confirmation', dSubDone:'Completed', dSubConfirmed:'Confirmed',
+  kPlayer:'Player', kTime:'Time', kCredits:'Credits', kCourt:'Court', kNote:'Note',
+  withdrawRequest:'Withdraw request',
+  approveCancel:'Approve cancel', withdrawCancel:'Withdraw cancel request',
+  approveChange:'Approve change', withdrawChange:'Withdraw change',
+  cancelSession:'Cancel session', markDoneShort:n=>'Mark done · −'+n+' cr',
+  moveSession:'Move / change court', reqCancel:'Request cancel', reqReschedule:'Request reschedule',
+  cancelReqBox:'Cancellation requested', rescheduleBox:'Reschedule requested: ',
+  settledBox:n=>'Completed — '+EN.credits(n)+' settled',
+  chgTitleAdm:'Move this session', chgTitleStu:'Request a reschedule', currently:'Currently ',
+  fNewDate:'New date', fCourtShort:'Court', fReason:'Reason · optional', reasonPh:'e.g. rain — moving indoors',
+  applyChange:'Apply change',
+  tMoved:'Session moved — let the player know', tChangeSent:'Reschedule request sent',
+  tChangeApproved:'Reschedule approved', tKeepOriginal:'Keeping the original time', tWithdrawn:'Request withdrawn',
+  tConfirmed:'Confirmed', tDeclined:'Request declined',
+  tNeedApproval:'Confirmed sessions need coach approval to cancel', tWithdrawn2:'Request withdrawn',
+  cxlTitle:'Request cancellation', cxlSub:'Confirmed sessions are cancelled only with coach approval.',
+  cxlReasonPh:'e.g. traveling, not feeling well', keepIt:'Keep it',
+  tCxlSent:'Cancellation request sent', tCancelled:'Session cancelled — no credits charged',
+  tKept:'Session kept', tCxlWithdrawn:'Cancel request withdrawn',
+  admCxlTitle:'Cancel this session?', admCxlSub:'No credits will be charged. This can’t be undone.',
+  tNoProfile:'Player profile not found',
+  tSettled:(n,name,left)=>'−'+n+' · '+name+' has '+EN.credits(left)+' left',
+  npTitle:'New player profile', npSub:'Share the player code — that’s how they sign in',
+  fName:'Name', namePh:'Name or nickname', fStartCredits:'Starting credits',
+  fCode:'Player code · auto-generated, editable', fNoteOpt:'Note · optional', noteStuPh:'Level, usual times…',
+  create:'Create',
+  tNeedName:'Give the player a name', tBadCode:'Code must be 4–6 digits', tCodeUsed:'That code is already in use',
+  tPlayerAdded:(n,c)=>n+' added — code '+c,
+  spCode:'Code ', topUp:'Top up', remove:'Remove', close:'Close',
+  tHasUpcoming:'This player still has upcoming sessions',
+  tTopUp:(n,name,left)=>'+'+n+' — '+name+' now has '+EN.credits(left),
+  rmTitle:n=>'Remove '+n+'?', rmSub:'Their profile and credit history will be deleted. This can’t be undone.', keep:'Keep', removed:'Removed',
+  pinTitle:'Change coach PIN', pinSub:'Shared by everyone on the coaching side',
+  fNewPin:'New PIN · 4–6 digits', pinPh:'New PIN', savePin:'Save',
+  tBadPin:'PIN must be 4–6 digits', tPinSaved:'PIN updated',
+  tDemoReset:'Demo data reset', formerPlayer:'Former player',
+};
+const ZH={
+  wd:['日','一','二','三','四','五','六'],
+  wdHead:['一','二','三','四','五','六','日'],
+  monthLabel:(y,m)=>y+'年'+(m+1)+'月',
+  dateLabel:(d,pre)=>pre+(d.getMonth()+1)+'月'+d.getDate()+'日 周'+ZH.wd[d.getDay()],
+  today:'今天', tomorrow:'明天',
+  langPill:'EN',
+  lgH1:'约课这件事，<br><em>妥了。</em>',
+  lgSub:'订课、调课、课时记录——都在这一页。',
+  duoCap:'教练 · 课务',
+  segStu:'学员', segAdm:'教练端',
+  codeLabelStu:'学员码', codeLabelAdm:'教练密码', codePh:'4 位数字',
+  enter:'进入', hint:'演示 — 学员码 1234 · 教练密码 8888',
+  needCodeStu:'请输入学员码', needCodeAdm:'请输入教练密码',
+  pinWrong:'密码不对哦', codeNotFound:'没找到这个学员码，问问教练',
+  hiCoach:'欢迎回来，教练', hiPlayer:n=>'欢迎回来，'+n,
+  syncFail:'同步失败——检查网络后重试',
+  serverFail:'连不上服务器——检查一下网络',
+  tabSchedule:'课表', tabInbox:'申请', tabPlayers:'学员', tabMe:'我的',
+  fabBook:'约课', fabAdd:'加课', fabNewPlayer:'添加学员',
+  eyebrowCoach:'教练台', eyebrowStu:'课表',
+  coachTitle:'本周一览',
+  coachSub:'确认订课、核销课时，把场地排满',
+  stuSub:'看准空位，先约先得',
+  greet:()=>{const h=new Date().getHours(); return h<12?'早上好':(h<18?'下午好':'晚上好');},
+  chipToday:n=>'今日 '+n+' 节课',
+  chipReview:n=>'待处理 '+n,
+  chipPlayers:n=>'学员 '+n+' 人',
+  chipCredits:n=>'剩余 '+n+' 课时',
+  chipNext:s=>'下节课 · '+s, chipNoNext:'还没约下节课',
+  btnToday:'今天', vtWeek:'周', vtMonth:'月',
+  nSessions:n=>n+' 节课',
+  credits:n=>n+' 课时',
+  crPill:n=>n+' 课时',
+  pillCancelReq:'取消申请中', pillReschedule:'调课', pillPending:'待确认', pillSettle:'待扣课时', pillConfirmed:'已确认', pillCancel:'取消',
+  booked:'已被预约',
+  emptyDayTitle:'这天还空着',
+  emptyDayAdm:'点下方空位或右下角"加课"排课',
+  emptyDayStu:'场地空着——点下方空位抢先约',
+  openSlotsTitle:'空闲时段 · 点击预约',
+  fullyBookedDay:'已约满，换一天看看',
+  secBookings:'订课申请', secReschedules:'调课申请', secCancels:'取消申请', secSettle:'已上完 · 待扣课时',
+  decline:'婉拒', confirm:'确认排课', withdraw:'撤回',
+  keepOriginal:'保持原课', approve:'同意',
+  keepSession:'保留课程',
+  markDone:n=>'确认上完 · 扣 '+n+' 课时',
+  note_:'备注：', reason_:'原因：',
+  inboxEmptyTitle:'都处理完啦', inboxEmptySub:'订课、调课、取消申请都会出现在这里',
+  codeWord:'学员码', creditsWord:'剩余课时',
+  newPlayerLine:'＋ 添加学员建档',
+  statWeek:'本周课程', statHours:'课时数', statReview:'待处理',
+  statCreditsLeft:'剩余课时', statHoursDone:'已上课时', statUpcoming:'待上课程',
+  rowSignedIn:'当前身份', rowCoach:'教练端', rowChangePin:'修改教练密码',
+  rowName:'称呼', rowPlayerCode:'学员码', rowTotalCredits:'总课时', topupsVia:'（充值找教练）',
+  rowLang:'Language · 语言', rowLangVal:'中文',
+  rowSignOut:'退出登录', rowReset:'重置演示数据',
+  bookTitleAdm:'直接加课', bookTitleStu:'申请约课',
+  bookSubAdm:'排入课表即为已确认',
+  bookSubStu:'提交后等教练确认 · 可约 8:00–21:00',
+  fPlayer:'学员', fDate:'日期', fDuration:'时长',
+  dur1:'1 小时 · 1 课时', dur2:'2 小时 · 2 课时',
+  pickTime:'选择时间 · ', nOpen:n=>n+' 个空位', fullyBooked:'已约满',
+  legendTap:'点一个空闲时段', legendTaken:'<s>划线的</s> = 已被约',
+  fCourt:'场地 · 自行订场后填场地名', courtPh:'例如：憨牛网球 浦东店',
+  fNote:'备注（可选）', notePh:'想练什么 / 场地订到几点',
+  myCredits:'我的剩余课时',
+  cancel:'取消', sendRequest:'提交申请', addToSchedule:'排入课表',
+  crLeft:n=>'（剩 '+n+' 课时）',
+  tPickDate:'请选择日期', tPickSlot:'先选一个空闲时段',
+  tTypeCourt:'先订好场地，再填场地名', tTypeCourt2:'请填写场地名',
+  tLate:'最晚 21:00 结束，换个时间', tPast:'不能约过去的日期',
+  tNoCredits:'课时不够了，找教练充值', tTaken:'该时段已被约，换一个时间',
+  tAdded:'已排入课表', tSent:'申请已发送，等待确认',
+  dSession:'课程详情', dSubPending:'待确认的约课申请', dSubDone:'已完成', dSubConfirmed:'已确认',
+  kPlayer:'学员', kTime:'时间', kCredits:'课时', kCourt:'场地', kNote:'备注',
+  withdrawRequest:'撤回申请',
+  approveCancel:'同意取消', withdrawCancel:'撤回取消申请',
+  approveChange:'同意调整', withdrawChange:'撤回调课',
+  cancelSession:'取消课程', markDoneShort:n=>'确认上完 · 扣 '+n+' 课时',
+  moveSession:'调时间 / 换场地', reqCancel:'申请取消', reqReschedule:'申请调课',
+  cancelReqBox:'取消申请', rescheduleBox:'调课申请：改为 ',
+  settledBox:n=>'本节已完成，已扣 '+n+' 课时',
+  chgTitleAdm:'调整这节课', chgTitleStu:'申请调课', currently:'原课程：',
+  fNewDate:'新日期', fCourtShort:'场地', fReason:'原因（可选）', reasonPh:'例如：下雨，改到室内',
+  applyChange:'直接调整',
+  tMoved:'已调整，记得告知学员', tChangeSent:'调课申请已发送',
+  tChangeApproved:'已同意调课', tKeepOriginal:'保持原课程', tWithdrawn:'已撤回',
+  tConfirmed:'已确认排课', tDeclined:'已婉拒该申请',
+  tNeedApproval:'已确认的课需教练批准才能取消', tWithdrawn2:'已撤回申请',
+  cxlTitle:'申请取消课程', cxlSub:'已确认的课需要教练批准才能取消。',
+  cxlReasonPh:'例如：出差 / 身体不舒服', keepIt:'再想想',
+  tCxlSent:'取消申请已发送', tCancelled:'已取消，不扣课时',
+  tKept:'已保留课程', tCxlWithdrawn:'已撤回取消申请',
+  admCxlTitle:'取消这节课？', admCxlSub:'不会扣课时。此操作不可恢复。',
+  tNoProfile:'学员档案不存在',
+  tSettled:(n,name,left)=>'已扣 '+n+' 课时，'+name+' 剩余 '+left+' 课时',
+  npTitle:'添加学员建档', npSub:'把学员码发给学员，即可登录约课',
+  fName:'学员姓名', namePh:'姓名或昵称', fStartCredits:'首购课时',
+  fCode:'学员码（自动生成，可改）', fNoteOpt:'备注（可选）', noteStuPh:'水平 / 习惯时间等',
+  create:'建档',
+  tNeedName:'请填写学员姓名', tBadCode:'学员码需为 4–6 位数字', tCodeUsed:'这个学员码已被使用',
+  tPlayerAdded:(n,c)=>'已为 '+n+' 建档，学员码 '+c,
+  spCode:'学员码 ', topUp:'充值课时', remove:'删除', close:'关闭',
+  tHasUpcoming:'该学员还有未完成课程',
+  tTopUp:(n,name,left)=>'已充值 '+n+'，'+name+' 剩余 '+left+' 课时',
+  rmTitle:n=>'删除 '+n+'？', rmSub:'学员档案与课时记录将被删除，不可恢复。', keep:'保留', removed:'已删除',
+  pinTitle:'修改教练密码', pinSub:'教练端共用这个密码登录',
+  fNewPin:'新密码 · 4–6 位数字', pinPh:'新密码', savePin:'保存',
+  tBadPin:'密码需为 4–6 位数字', tPinSaved:'密码已更新',
+  tDemoReset:'已重置演示数据', formerPlayer:'已注销学员',
+};
+function L(){ return LANG==='zh'?ZH:EN; }
+function toggleLang(){
+  LANG = LANG==='en'?'zh':'en';
+  try{ localStorage.setItem(LANG_KEY,LANG); }catch(e){}
+  applyLangStatic();
+  if(S.session && (isAdmin()||meStu())){ renderTabbar(); switchTab(curTab); }
+  closeSheet();
+}
+function applyLangStatic(){
+  const T=L();
+  $('langPillLogin').textContent=T.langPill;
+  $('lgH1').innerHTML=T.lgH1;
+  $('lgSub').textContent=T.lgSub;
+  $('duoCap').textContent=T.duoCap;
+  $('segStu').textContent=T.segStu;
+  $('segAdm').textContent=T.segAdm;
+  $('codeLabel').textContent = loginMode==='student'?T.codeLabelStu:T.codeLabelAdm;
+  $('codeInput').placeholder=T.codePh;
+  $('enterBtn').textContent=T.enter;
+  $('loginHint').textContent=T.hint;
+  $('btnToday').textContent=T.btnToday;
+  $('vtWeek').textContent=T.vtWeek;
+  $('vtMonth').textContent=T.vtMonth;
+  $('wdRow').innerHTML=T.wdHead.map(w=>'<span>'+w+'</span>').join('');
+}
+
+/* ================= dates ================= */
+function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayStr(){ return fmtDate(new Date()); }
+function parseDate(s){ const [y,m,dd]=s.split('-').map(Number); return new Date(y,m-1,dd); }
+function addDays(s,n){ const d=parseDate(s); d.setDate(d.getDate()+n); return fmtDate(d); }
+function hh(h){ return String(h).padStart(2,'0')+':00'; }
+function dateLabel(s){
+  const d=parseDate(s), t=todayStr(), T=L();
+  const pre= s===t? T.today+' · ' : (s===addDays(t,1)? T.tomorrow+' · ' : '');
+  return T.dateLabel(d,pre);
+}
+
+/* ================= data ================= */
+function seed(){
+  const t=todayStr(); let li=1;
+  const Ls=(off,start,dur,sid,loc,status,extra)=>Object.assign(
+    {id:'l'+(li++), date:addDays(t,off), start, dur, studentId:sid, location:loc, status, change:null, cancelReq:null, settled:false, note:''}, extra||{});
+  return {
+    adminPin:ADMIN_PIN_DEFAULT,
+    session:null,
+    students:[
+      {id:'s1', name:'Lily',  code:'1234', totalHours:20, usedHours:8,  note:'Working on backhand'},
+      {id:'s2', name:'Anna',  code:'5678', totalHours:30, usedHours:12, note:'Weekend mornings'},
+      {id:'s3', name:'Kevin', code:'2468', totalHours:10, usedHours:9,  note:'Low on credits'},
+      {id:'s4', name:'Chen',  code:'1357', totalHours:16, usedHours:6,  note:''},
+    ],
+    lessons:[
+      Ls(-1,18,1,'s1',LOC_DEFAULTS[0],'confirmed'),
+      Ls(0,10,1,'s2',LOC_DEFAULTS[1],'confirmed'),
+      Ls(0,18,1,'s1',LOC_DEFAULTS[0],'confirmed'),
+      Ls(1,19,1,'s3',LOC_DEFAULTS[0],'pending'),
+      Ls(2,18,1,'s4',LOC_DEFAULTS[2],'confirmed',{change:{date:addDays(t,3),start:19,location:LOC_DEFAULTS[2],note:'Work ran late — can we do the next day?'}}),
+      Ls(4,17,2,'s1',LOC_DEFAULTS[1],'pending'),
+      Ls(5,9,2,'s2',LOC_DEFAULTS[3],'confirmed'),
+      Ls(6,16,1,'s3',LOC_DEFAULTS[0],'confirmed',{cancelReq:{note:'Traveling next week'}}),
+    ]
+  };
+}
+let S;
+if(CLOUD){
+  S={adminPin:ADMIN_PIN_DEFAULT, students:[], lessons:[], session:null};
+}else{
+  try{ S=JSON.parse(localStorage.getItem(KEY))||seed(); }catch(e){ S=seed(); }
+}
+try{ S.session=JSON.parse(localStorage.getItem(SESSION_KEY)) || S.session || null; }catch(e){}
+
+let _pushT=null, _dirty=false;
+function save(){
+  localStorage.setItem(SESSION_KEY, JSON.stringify(S.session||null));
+  if(!CLOUD){ localStorage.setItem(KEY, JSON.stringify(S)); return; }
+  _dirty=true;
+  const body=JSON.stringify({data:{adminPin:S.adminPin, students:S.students, lessons:S.lessons}});
+  clearTimeout(_pushT);
+  _pushT=setTimeout(async()=>{
+    try{
+      const r=await fetch(SB_ROW,{method:'PATCH',headers:Object.assign({'Prefer':'return=minimal'},SB_HEADERS),body});
+      if(!r.ok) throw new Error('push '+r.status);
+      _dirty=false;
+    }catch(e){ toast(L().syncFail); }
+  }, 80);
+}
+async function pullState(){
+  if(!CLOUD || _dirty) return;
+  const r=await fetch(SB_ROW+'&select=data',{headers:SB_HEADERS, cache:'no-store'});
+  if(!r.ok) throw new Error('pull '+r.status);
+  const rows=await r.json();
+  const d=(rows[0] && rows[0].data) || {};
+  if(_dirty) return;
+  S.adminPin=d.adminPin||ADMIN_PIN_DEFAULT;
+  S.students=Array.isArray(d.students)?d.students:[];
+  S.lessons=Array.isArray(d.lessons)?d.lessons:[];
+}
+
+let selDate=todayStr(), calMode='week', curTab='schedule', loginMode='student';
+
+/* ================= helpers ================= */
+const $=id=>document.getElementById(id);
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2400); }
+function isAdmin(){ return S.session && S.session.role==='admin'; }
+function meStu(){ return S.session && S.session.role==='student' ? S.students.find(s=>s.id===S.session.studentId) : null; }
+function stuOf(l){ return S.students.find(s=>s.id===l.studentId); }
+function stuName(l){ const s=stuOf(l); return s? s.name : L().formerPlayer; }
+function mine(l){ return isAdmin() || (meStu() && l.studentId===meStu().id); }
+function remaining(s){ return s.totalHours-s.usedHours; }
+function isPast(l){
+  const t=todayStr();
+  if(l.date<t) return true;
+  if(l.date>t) return false;
+  return (l.start+l.dur)<=new Date().getHours();
+}
+function locList(){
+  const set=new Set(LOC_DEFAULTS);
+  S.lessons.forEach(l=>set.add(l.location));
+  return [...set];
+}
+function pendingCount(){
+  if(isAdmin()){
+    return S.lessons.filter(l=>l.status==='pending'||l.change||l.cancelReq).length
+      + S.lessons.filter(l=>l.status==='confirmed'&&!l.settled&&isPast(l)).length;
+  }
+  const me=meStu(); if(!me) return 0;
+  return S.lessons.filter(l=>l.studentId===me.id&&(l.status==='pending'||l.change||l.cancelReq)).length;
+}
+function freeAt(date,start,dur,excludeId){
+  if(start<8 || start+dur>21) return false;
+  return !S.lessons.some(l=>l.id!==excludeId && l.date===date && !(start+dur<=l.start || l.start+l.dur<=start));
+}
+function openSlots(date,dur,excludeId){
+  const out=[]; for(let t=8;t<=20;t++) if(freeAt(date,t,dur,excludeId)) out.push(t); return out;
+}
+
+/* ================= login ================= */
+function setLoginMode(m){
+  loginMode=m;
+  $('segStu').classList.toggle('on',m==='student');
+  $('segAdm').classList.toggle('on',m==='admin');
+  $('codeLabel').textContent = m==='student'?L().codeLabelStu:L().codeLabelAdm;
+  $('codeInput').value='';
+}
+async function doLogin(){
+  const v=$('codeInput').value.trim();
+  if(!v){ toast(loginMode==='student'?L().needCodeStu:L().needCodeAdm); return; }
+  if(CLOUD){ try{ await pullState(); }catch(e){} }
+  if(loginMode==='admin'){
+    if(v!==S.adminPin){ toast(L().pinWrong); return; }
+    S.session={role:'admin'};
+  }else{
+    const st=S.students.find(s=>s.code===v);
+    if(!st){ toast(L().codeNotFound); return; }
+    S.session={role:'student', studentId:st.id};
+  }
+  save(); boot();
+  toast(isAdmin()?L().hiCoach:L().hiPlayer(meStu().name));
+}
+function logout(){ S.session=null; save(); boot(); }
+
+/* ================= boot / frame ================= */
+function boot(){
+  applyLangStatic();
+  const logged=!!S.session && (isAdmin()||meStu());
+  $('login').classList.toggle('hidden',logged);
+  $('app').classList.toggle('hidden',!logged);
+  window.scrollTo(0,0);
+  if(!logged){ setLoginMode('student'); return; }
+  if(curTab==='students'&&!isAdmin()) curTab='schedule';
+  renderTabbar(); switchTab(curTab);
+}
+function renderTabbar(){
+  const T=L();
+  const tabs=[
+    {k:'schedule',label:T.tabSchedule,icon:'<rect x="3" y="5" width="18" height="16" rx="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 9.5h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'},
+    {k:'requests',label:T.tabInbox,icon:'<path d="M4 6h16M4 12h16M4 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',badge:true},
+  ];
+  if(isAdmin()) tabs.push({k:'students',label:T.tabPlayers,icon:'<circle cx="9" cy="8.5" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c.6-2.8 2.8-4.5 5.5-4.5s4.9 1.7 5.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="16.5" cy="9.5" r="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M16 14.6c2.4.2 4 1.7 4.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'});
+  tabs.push({k:'profile',label:T.tabMe,icon:'<circle cx="12" cy="8.5" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c.8-3.2 3.6-5 7-5s6.2 1.8 7 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'});
+  $('tabbar').innerHTML=tabs.map(t=>
+    '<button id="tab_'+t.k+'" onclick="switchTab(\''+t.k+'\')"><svg viewBox="0 0 24 24" fill="none">'+t.icon+'</svg>'+t.label
+    +(t.badge?'<span class="badge hidden" id="reqBadge"></span>':'')+'</button>').join('');
+}
+function renderHero(){
+  const T=L();
+  if(isAdmin()){
+    $('heroEyebrow').textContent=T.eyebrowCoach;
+    $('heroTitle').textContent=T.coachTitle;
+    $('heroSub').textContent=T.coachSub;
+    const t=todayStr();
+    const todayN=S.lessons.filter(l=>l.date===t&&l.status==='confirmed').length;
+    $('heroChips').innerHTML='<span class="hchip ball">'+T.chipToday(todayN)+'</span>'
+      +'<span class="hchip">'+T.chipReview(pendingCount())+'</span>'
+      +'<span class="hchip">'+T.chipPlayers(S.students.length)+'</span>';
+  }else{
+    const me=meStu();
+    $('heroEyebrow').textContent=T.eyebrowStu;
+    $('heroTitle').textContent=T.greet()+(LANG==='zh'?'，':', ')+me.name;
+    $('heroSub').textContent=T.stuSub;
+    const nxt=S.lessons.filter(l=>l.studentId===me.id&&l.status==='confirmed'&&!isPast(l)).sort((a,b)=>(a.date+hh(a.start)).localeCompare(b.date+hh(b.start)))[0];
+    $('heroChips').innerHTML='<span class="hchip ball">'+T.chipCredits(remaining(me))+'</span>'
+      +'<span class="hchip">'+(nxt? T.chipNext(dateLabel(nxt.date)+' '+hh(nxt.start)) : T.chipNoNext)+'</span>';
+  }
+}
+function render(){
+  renderHero();
+  const n=pendingCount(), b=$('reqBadge');
+  if(b){ b.classList.toggle('hidden',n===0); b.textContent=n; }
+  if(curTab==='schedule'){ renderCal(); renderDay(); }
+  if(curTab==='requests') renderRequests();
+  if(curTab==='students') renderStudents();
+  if(curTab==='profile') renderProfile();
+}
+function switchTab(t){
+  curTab=t;
+  ['viewSchedule','viewRequests','viewStudents','viewProfile'].forEach(v=>$(v).classList.add('hidden'));
+  $({schedule:'viewSchedule',requests:'viewRequests',students:'viewStudents',profile:'viewProfile'}[t]).classList.remove('hidden');
+  document.querySelectorAll('nav button').forEach(btn=>btn.classList.toggle('on',btn.id==='tab_'+t));
+  $('fab').classList.toggle('hidden',!(t==='schedule'||(t==='students'&&isAdmin())));
+  $('fabText').textContent = t==='students'?L().fabNewPlayer:(isAdmin()?L().fabAdd:L().fabBook);
+  $('fab').onclick = t==='students'? openAddStudent : openBookSheet;
+  render();
+}
+
+/* ================= calendar ================= */
+function weekStart(s){ const d=parseDate(s); const wd=(d.getDay()+6)%7; d.setDate(d.getDate()-wd); return fmtDate(d); }
+function setCalMode(m){ calMode=m; render(); }
+function shiftCal(n){ selDate = calMode==='week'? addDays(selDate,7*n) : fmtDate(new Date(parseDate(selDate).getFullYear(), parseDate(selDate).getMonth()+n, 1)); render(); }
+function goToday(){ selDate=todayStr(); render(); }
+function selectDay(d){ selDate=d; render(); }
+
+function cellHtml(ds, dim){
+  const t=todayStr(); const d=parseDate(ds);
+  const ls=S.lessons.filter(l=>l.date===ds);
+  const dots=ls.slice(0,3).map(l=>'<i class="'+(l.status==='pending'?'p':'')+'"></i>').join('');
+  return '<button class="cell'+(dim?' dim':'')+(ds===t?' today':'')+(ds===selDate?' sel':'')+'" onclick="selectDay(\''+ds+'\')">'
+    +'<span class="num">'+d.getDate()+'</span><span class="marks">'+dots+'</span></button>';
+}
+function renderCal(){
+  const md=parseDate(selDate);
+  $('monthLabel').textContent=L().monthLabel(md.getFullYear(),md.getMonth());
+  $('vtWeek').classList.toggle('on',calMode==='week');
+  $('vtMonth').classList.toggle('on',calMode==='month');
+  let html='';
+  if(calMode==='week'){
+    const ws=weekStart(selDate);
+    for(let i=0;i<7;i++) html+=cellHtml(addDays(ws,i),false);
+  }else{
+    const first=fmtDate(new Date(md.getFullYear(),md.getMonth(),1));
+    let cur=weekStart(first);
+    for(let i=0;i<42;i++){
+      const dim=parseDate(cur).getMonth()!==md.getMonth();
+      html+=cellHtml(cur,dim);
+      cur=addDays(cur,1);
+      if(i>=34 && parseDate(cur).getMonth()!==md.getMonth() && (i+1)%7===0) break;
+    }
+  }
+  $('calGrid').innerHTML=html;
+}
+
+/* ================= day list ================= */
+function pillOf(l){
+  const T=L();
+  if(l.cancelReq) return '<span class="pill no">'+T.pillCancelReq+'</span>';
+  if(l.change) return '<span class="pill chg">'+T.pillReschedule+'</span>';
+  if(l.status==='pending') return '<span class="pill wait">'+T.pillPending+'</span>';
+  if(isAdmin()&&!l.settled&&isPast(l)) return '<span class="pill wait">'+T.pillSettle+'</span>';
+  return '<span class="pill ok">'+T.pillConfirmed+'</span>';
+}
+function openSlotsHtml(){
+  if(selDate<todayStr()) return '';
+  const T=L();
+  const open=openSlots(selDate,1);
+  let inner;
+  if(!open.length) inner='<div class="mini-slots" style="color:var(--faint);font-size:12.5px">'+T.fullyBookedDay+'</div>';
+  else inner='<div class="mini-slots">'+open.map(h=>'<button class="mini-slot" onclick="quickBook('+h+')">'+hh(h)+'</button>').join('')+'</div>';
+  return '<div class="sec-title">'+T.openSlotsTitle+'</div>'+inner;
+}
+function renderDay(){
+  const T=L();
+  $('dayTitle').textContent=dateLabel(selDate);
+  const ls=S.lessons.filter(l=>l.date===selDate).sort((a,b)=>a.start-b.start);
+  $('dayCount').textContent=ls.length? T.nSessions(ls.length):'';
+  if(!ls.length){
+    $('lessonList').innerHTML='<div class="empty"><b>'+T.emptyDayTitle+'</b>'
+      +(isAdmin()?T.emptyDayAdm:T.emptyDayStu)+'</div>'
+      +openSlotsHtml();
+    return;
+  }
+  $('lessonList').innerHTML=ls.map(l=>{
+    if(!mine(l)){
+      return '<div class="lesson locked"><div class="time"><b>'+hh(l.start)+'</b><span>'+hh(l.start+l.dur)+'</span></div><div class="bar"></div>'
+        +'<div class="info"><div class="who">'+T.booked+'</div><div class="where">'+esc(l.location)+'</div></div></div>';
+    }
+    return '<div class="lesson '+(l.status==='pending'?'pending':'')+'" onclick="openDetail(\''+l.id+'\')">'
+      +'<div class="time"><b>'+hh(l.start)+'</b><span>'+hh(l.start+l.dur)+'</span></div><div class="bar"></div>'
+      +'<div class="info"><div class="who">'+esc(stuName(l))+' <span class="pill hrs">'+T.crPill(l.dur)+'</span>'+pillOf(l)+'</div>'
+      +'<div class="where"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 11s4-3.6 4-6.5A4 4 0 0 0 2 4.5C2 7.4 6 11 6 11z" stroke="currentColor"/><circle cx="6" cy="4.5" r="1.3" stroke="currentColor"/></svg>'+esc(l.location)+'</div></div></div>';
+  }).join('')+openSlotsHtml();
+}
+function quickBook(h){ openBookSheet(selDate,h); }
+
+/* ================= requests ================= */
+function renderRequests(){
+  const T=L();
+  const my=l=>mine(l);
+  const bookings=S.lessons.filter(l=>l.status==='pending'&&my(l));
+  const changes=S.lessons.filter(l=>l.change&&my(l));
+  const cancels=S.lessons.filter(l=>l.cancelReq&&my(l));
+  const settles=isAdmin()? S.lessons.filter(l=>l.status==='confirmed'&&!l.settled&&isPast(l)) : [];
+  let html='';
+  if(bookings.length){
+    html+='<div class="sec-title">'+T.secBookings+'</div>'+bookings.map(l=>{
+      const acts=isAdmin()
+        ?'<div class="acts"><button class="btn" onclick="rejectLesson(\''+l.id+'\')">'+T.decline+'</button><button class="btn primary" onclick="confirmLesson(\''+l.id+'\')">'+T.confirm+'</button></div>'
+        :'<div class="acts"><button class="btn danger" onclick="withdrawBooking(\''+l.id+'\')">'+T.withdraw+'</button></div>';
+      return '<div class="req"><div class="head"><b>'+esc(stuName(l))+'</b><span class="pill wait">'+T.pillPending+'</span></div>'
+        +'<div class="body">'+dateLabel(l.date)+' · '+hh(l.start)+'–'+hh(l.start+l.dur)+' · '+T.credits(l.dur)+'<br>'+esc(l.location)+(l.note?'<br>'+T.note_+esc(l.note):'')+'</div>'+acts+'</div>';
+    }).join('');
+  }
+  if(changes.length){
+    html+='<div class="sec-title">'+T.secReschedules+'</div>'+changes.map(l=>{
+      const c=l.change;
+      const acts=isAdmin()
+        ?'<div class="acts"><button class="btn" onclick="rejectChange(\''+l.id+'\')">'+T.keepOriginal+'</button><button class="btn primary" onclick="approveChange(\''+l.id+'\')">'+T.approve+'</button></div>'
+        :'<div class="acts"><button class="btn danger" onclick="rejectChange(\''+l.id+'\')">'+T.withdraw+'</button></div>';
+      return '<div class="req"><div class="head"><b>'+esc(stuName(l))+'</b><span class="pill chg">'+T.pillReschedule+'</span></div>'
+        +'<div class="body">'+dateLabel(l.date)+' · '+hh(l.start)+' · '+esc(l.location)
+        +'<br><span class="arrow">→ '+dateLabel(c.date)+' · '+hh(c.start)+' · '+esc(c.location)+'</span>'
+        +(c.note?'<br>'+T.reason_+esc(c.note):'')+'</div>'+acts+'</div>';
+    }).join('');
+  }
+  if(cancels.length){
+    html+='<div class="sec-title">'+T.secCancels+'</div>'+cancels.map(l=>{
+      const acts=isAdmin()
+        ?'<div class="acts"><button class="btn" onclick="rejectCancel(\''+l.id+'\')">'+T.keepSession+'</button><button class="btn danger" onclick="approveCancel(\''+l.id+'\')">'+T.approve+'</button></div>'
+        :'<div class="acts"><button class="btn" onclick="rejectCancel(\''+l.id+'\')">'+T.withdraw+'</button></div>';
+      return '<div class="req"><div class="head"><b>'+esc(stuName(l))+'</b><span class="pill no">'+T.pillCancel+'</span></div>'
+        +'<div class="body">'+dateLabel(l.date)+' · '+hh(l.start)+'–'+hh(l.start+l.dur)+' · '+esc(l.location)
+        +(l.cancelReq.note?'<br>'+T.reason_+esc(l.cancelReq.note):'')+'</div>'+acts+'</div>';
+    }).join('');
+  }
+  if(settles.length){
+    html+='<div class="sec-title">'+T.secSettle+'</div>'+settles.map(l=>
+      '<div class="req"><div class="head"><b>'+esc(stuName(l))+'</b><span class="pill wait">'+T.crPill(l.dur)+'</span></div>'
+      +'<div class="body">'+dateLabel(l.date)+' · '+hh(l.start)+'–'+hh(l.start+l.dur)+' · '+esc(l.location)+'</div>'
+      +'<div class="acts"><button class="btn ball" onclick="settleLesson(\''+l.id+'\')">'+T.markDone(l.dur)+'</button></div></div>').join('');
+  }
+  $('reqList').innerHTML=html||'<div class="empty"><b>'+T.inboxEmptyTitle+'</b>'+T.inboxEmptySub+'</div>';
+}
+
+/* ================= players (admin) ================= */
+function renderStudents(){
+  const T=L();
+  $('stuList').innerHTML=
+    S.students.map(s=>{
+      const r=remaining(s);
+      return '<div class="stu" onclick="openStudent(\''+s.id+'\')">'
+        +'<div class="badge-face">'+esc(s.name[0].toUpperCase())+'</div>'
+        +'<div class="mid"><b>'+esc(s.name)+'</b><span>'+T.codeWord+' '+s.code+(s.note?' · '+esc(s.note):'')+'</span></div>'
+        +'<div class="bal"><b class="'+(r<=2?'low':'')+'">'+r+'</b><span>'+T.creditsWord+'</span></div></div>';
+    }).join('')
+    +'<button class="add-line" onclick="openAddStudent()">'+T.newPlayerLine+'</button>';
+}
+
+/* ================= profile ================= */
+function renderProfile(){
+  const T=L();
+  const t=todayStr(); let html='';
+  if(isAdmin()){
+    const ws=weekStart(t), we=addDays(ws,6);
+    const wk=S.lessons.filter(l=>l.status==='confirmed'&&l.date>=ws&&l.date<=we);
+    const hrs=wk.reduce((a,l)=>a+l.dur,0);
+    html+='<div class="stat-grid">'
+      +'<div class="stat"><b>'+wk.length+'</b><span>'+T.statWeek+'</span></div>'
+      +'<div class="stat"><b>'+hrs+'</b><span>'+T.statHours+'</span></div>'
+      +'<div class="stat"><b>'+pendingCount()+'</b><span>'+T.statReview+'</span></div></div>'
+      +'<div class="card">'
+      +'<div class="row"><span class="l">'+T.rowSignedIn+'</span><span class="r">'+T.rowCoach+'</span></div>'
+      +'<div class="row click" onclick="openPinSheet()"><span class="l">'+T.rowChangePin+'</span><span class="r">›</span></div></div>';
+  }else{
+    const me=meStu();
+    const nxtN=S.lessons.filter(l=>l.studentId===me.id&&l.status==='confirmed'&&!isPast(l)).length;
+    html+='<div class="stat-grid">'
+      +'<div class="stat"><b>'+remaining(me)+'</b><span>'+T.statCreditsLeft+'</span></div>'
+      +'<div class="stat"><b>'+me.usedHours+'</b><span>'+T.statHoursDone+'</span></div>'
+      +'<div class="stat"><b>'+nxtN+'</b><span>'+T.statUpcoming+'</span></div></div>'
+      +'<div class="card">'
+      +'<div class="row"><span class="l">'+T.rowName+'</span><span class="r">'+esc(me.name)+'</span></div>'
+      +'<div class="row"><span class="l">'+T.rowPlayerCode+'</span><span class="r">'+me.code+'</span></div>'
+      +'<div class="row"><span class="l">'+T.rowTotalCredits+'</span><span class="r">'+me.totalHours+T.topupsVia+'</span></div></div>';
+  }
+  html+='<div class="card">'
+    +'<div class="row click" onclick="toggleLang()"><span class="l">'+T.rowLang+'</span><span class="r">'+T.rowLangVal+' ›</span></div>'
+    +'<div class="row click" onclick="logout()"><span class="l">'+T.rowSignOut+'</span><span class="r">›</span></div>'
+    +(CLOUD?'':'<div class="row click" onclick="resetDemo()"><span class="l" style="color:var(--red)">'+T.rowReset+'</span><span class="r">›</span></div>')+'</div>'
+    +'<p style="font-size:10.5px;color:var(--faint);text-align:center;margin-top:16px;letter-spacing:.24em;text-transform:uppercase">Max Tennis Club</p>';
+  $('profileMain').innerHTML=html;
+}
+
+/* ================= sheets ================= */
+function openSheet(html){ $('sheetBody').innerHTML='<div class="grip"></div>'+html; $('overlay').classList.add('show'); }
+function closeSheet(){ $('overlay').classList.remove('show'); }
+
+/* ---- booking ---- */
+let _dur=1, _start=null, _slotDate=null, _slotExclude=null;
+function pickDur(d,ev){
+  _dur=d; document.querySelectorAll('#durChips .chip').forEach(c=>c.classList.remove('on')); ev.currentTarget.classList.add('on');
+  refreshSlots();
+}
+function slotCells(){
+  let h='';
+  for(let t=8;t<=20;t++){
+    const free=freeAt(_slotDate,t,_dur,_slotExclude);
+    h+= free
+      ? '<button class="slot'+(t===_start?' on':'')+'" onclick="pickSlot('+t+')">'+hh(t)+'</button>'
+      : '<span class="slot taken">'+hh(t)+'</span>';
+  }
+  return h;
+}
+function refreshSlots(){
+  const el=$('slotGrid'); if(!el) return;
+  if(_start!==null && !freeAt(_slotDate,_start,_dur,_slotExclude)) _start=null;
+  el.innerHTML=slotCells();
+  const n=openSlots(_slotDate,_dur,_slotExclude).length;
+  const lbl=$('slotCount'); if(lbl) lbl.textContent = n? L().nOpen(n) : L().fullyBooked;
+}
+function pickSlot(t){ _start=t; refreshSlots(); }
+function slotDateChanged(v){ _slotDate=v; _start=null; refreshSlots(); }
+function slotFieldHtml(){
+  const T=L();
+  return '<label class="f-label">'+T.pickTime+'<span id="slotCount"></span></label>'
+    +'<div class="slot-grid" id="slotGrid"></div>'
+    +'<div class="slot-legend"><span>'+T.legendTap+'</span><span>'+T.legendTaken+'</span></div>';
+}
+function stuOptions(){
+  return S.students.map(s=>'<option value="'+s.id+'">'+esc(s.name)+L().crLeft(remaining(s))+'</option>').join('');
+}
+function locDatalist(){
+  return '<datalist id="locs">'+locList().map(l=>'<option value="'+esc(l)+'">').join('')+'</datalist>';
+}
+function openBookSheet(dateArg, hourArg){
+  const T=L();
+  _dur=1;
+  _slotDate = (typeof dateArg==='string' && dateArg>=todayStr()) ? dateArg : (selDate>=todayStr()?selDate:todayStr());
+  _slotExclude=null;
+  _start = (typeof hourArg==='number' && freeAt(_slotDate,hourArg,1)) ? hourArg : null;
+  const admin=isAdmin(); const me=meStu();
+  openSheet(
+    '<h3>'+(admin?T.bookTitleAdm:T.bookTitleStu)+'</h3><p class="sub">'+(admin?T.bookSubAdm:T.bookSubStu)+'</p>'
+    +(admin?'<label class="f-label" for="bStu">'+T.fPlayer+'</label><select class="f-select" id="bStu">'+stuOptions()+'</select>':'')
+    +'<label class="f-label" for="bDate">'+T.fDate+'</label><input class="f-input" type="date" id="bDate" value="'+_slotDate+'" min="'+todayStr()+'" onchange="slotDateChanged(this.value)">'
+    +'<label class="f-label">'+T.fDuration+'</label><div class="chips" id="durChips">'
+    +'<button class="chip on" onclick="pickDur(1,event)">'+T.dur1+'</button>'
+    +'<button class="chip" onclick="pickDur(2,event)">'+T.dur2+'</button></div>'
+    +slotFieldHtml()
+    +'<label class="f-label" for="bLoc">'+T.fCourt+'</label>'
+    +'<input class="f-input" id="bLoc" list="locs" placeholder="'+T.courtPh+'">'+locDatalist()
+    +'<label class="f-label" for="bNote">'+T.fNote+'</label><input class="f-input" id="bNote" placeholder="'+T.notePh+'">'
+    +(me?'<div class="balance-tip"><span>'+T.myCredits+'</span><span>'+remaining(me)+'</span></div>':'')
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.cancel+'</button>'
+    +'<button class="btn primary" onclick="submitBook()">'+(admin?T.addToSchedule:T.sendRequest)+'</button></div>'
+  );
+  refreshSlots();
+}
+function submitBook(){
+  const T=L();
+  const admin=isAdmin();
+  const date=$('bDate').value, start=_start, loc=$('bLoc').value.trim(), note=$('bNote').value.trim();
+  const sid=admin? $('bStu').value : meStu().id;
+  const st=S.students.find(s=>s.id===sid);
+  if(!date){ toast(T.tPickDate); return; }
+  if(start===null){ toast(T.tPickSlot); return; }
+  if(!loc){ toast(T.tTypeCourt); return; }
+  if(start+_dur>21){ toast(T.tLate); return; }
+  if(date<todayStr()){ toast(T.tPast); return; }
+  if(!admin && remaining(st)<_dur){ toast(T.tNoCredits); return; }
+  const clash=S.lessons.some(l=>l.date===date && !(start+_dur<=l.start || l.start+l.dur<=start));
+  if(clash){ toast(T.tTaken); return; }
+  S.lessons.push({id:'l'+Date.now(), date, start, dur:_dur, studentId:sid, location:loc, status:admin?'confirmed':'pending', change:null, cancelReq:null, settled:false, note});
+  save(); closeSheet(); selDate=date; switchTab('schedule');
+  toast(admin?T.tAdded:T.tSent);
+}
+
+/* ---- detail ---- */
+function openDetail(id){
+  const T=L();
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  const admin=isAdmin();
+  let acts='', extra='';
+  if(l.status==='pending'){
+    acts=admin
+      ?'<div class="acts"><button class="btn" onclick="rejectLesson(\''+id+'\')">'+T.decline+'</button><button class="btn primary" onclick="confirmLesson(\''+id+'\')">'+T.confirm+'</button></div>'
+      :'<div class="acts"><button class="btn danger" onclick="withdrawBooking(\''+id+'\')">'+T.withdrawRequest+'</button></div>';
+  }else if(l.cancelReq){
+    extra='<div class="note-box cxl">'+T.cancelReqBox+(l.cancelReq.note?': '+esc(l.cancelReq.note):'')+'</div>';
+    acts=admin
+      ?'<div class="acts"><button class="btn" onclick="rejectCancel(\''+id+'\')">'+T.keepSession+'</button><button class="btn danger" onclick="approveCancel(\''+id+'\')">'+T.approveCancel+'</button></div>'
+      :'<div class="acts"><button class="btn" onclick="rejectCancel(\''+id+'\')">'+T.withdrawCancel+'</button></div>';
+  }else if(l.change){
+    extra='<div class="note-box chg">'+T.rescheduleBox+dateLabel(l.change.date)+' · '+hh(l.change.start)+' · '+esc(l.change.location)+(l.change.note?'<br>'+T.reason_+esc(l.change.note):'')+'</div>';
+    acts=admin
+      ?'<div class="acts"><button class="btn" onclick="rejectChange(\''+id+'\')">'+T.keepOriginal+'</button><button class="btn primary" onclick="approveChange(\''+id+'\')">'+T.approveChange+'</button></div>'
+      :'<div class="acts"><button class="btn danger" onclick="rejectChange(\''+id+'\')">'+T.withdrawChange+'</button></div>';
+  }else if(admin&&!l.settled&&isPast(l)){
+    acts='<div class="acts"><button class="btn danger" onclick="cancelByAdmin(\''+id+'\')">'+T.cancelSession+'</button>'
+      +'<button class="btn ball" onclick="settleLesson(\''+id+'\')">'+T.markDoneShort(l.dur)+'</button></div>';
+  }else if(l.settled){
+    extra='<div class="note-box warn">'+T.settledBox(l.dur)+'</div>';
+  }else{
+    acts=admin
+      ?'<div class="acts"><button class="btn danger" onclick="cancelByAdmin(\''+id+'\')">'+T.cancel+'</button><button class="btn primary" onclick="openChangeSheet(\''+id+'\')">'+T.moveSession+'</button></div>'
+      :'<div class="acts"><button class="btn danger" onclick="openCancelSheet(\''+id+'\')">'+T.reqCancel+'</button><button class="btn primary" onclick="openChangeSheet(\''+id+'\')">'+T.reqReschedule+'</button></div>';
+  }
+  openSheet(
+    '<h3>'+T.dSession+'</h3><p class="sub">'+(l.status==='pending'?T.dSubPending:(l.settled?T.dSubDone:T.dSubConfirmed))+'</p>'
+    +'<div class="kv"><span class="k">'+T.kPlayer+'</span><span class="v">'+esc(stuName(l))+'</span></div>'
+    +'<div class="kv"><span class="k">'+T.kTime+'</span><span class="v">'+dateLabel(l.date)+' · '+hh(l.start)+'–'+hh(l.start+l.dur)+'</span></div>'
+    +'<div class="kv"><span class="k">'+T.kCredits+'</span><span class="v">'+l.dur+'</span></div>'
+    +'<div class="kv"><span class="k">'+T.kCourt+'</span><span class="v">'+esc(l.location)+'</span></div>'
+    +(l.note?'<div class="kv"><span class="k">'+T.kNote+'</span><span class="v">'+esc(l.note)+'</span></div>':'')
+    +extra+acts
+  );
+}
+
+/* ---- reschedule ---- */
+function openChangeSheet(id){
+  const T=L();
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  const admin=isAdmin();
+  _dur=l.dur; _slotDate=(l.date>=todayStr()?l.date:todayStr()); _slotExclude=id;
+  _start=freeAt(_slotDate,l.start,l.dur,id)? l.start : null;
+  openSheet(
+    '<h3>'+(admin?T.chgTitleAdm:T.chgTitleStu)+'</h3><p class="sub">'+T.currently+dateLabel(l.date)+' · '+hh(l.start)+' · '+esc(l.location)+'</p>'
+    +'<label class="f-label" for="cDate">'+T.fNewDate+'</label><input class="f-input" type="date" id="cDate" value="'+_slotDate+'" min="'+todayStr()+'" onchange="slotDateChanged(this.value)">'
+    +slotFieldHtml()
+    +'<label class="f-label" for="cLoc">'+T.fCourtShort+'</label><input class="f-input" id="cLoc" list="locs" value="'+esc(l.location)+'">'+locDatalist()
+    +'<label class="f-label" for="cNote">'+T.fReason+'</label><input class="f-input" id="cNote" placeholder="'+T.reasonPh+'">'
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.cancel+'</button>'
+    +'<button class="btn primary" onclick="submitChange(\''+id+'\')">'+(admin?T.applyChange:T.sendRequest)+'</button></div>'
+  );
+  refreshSlots();
+}
+function submitChange(id){
+  const T=L();
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  const date=$('cDate').value, start=_start, loc=$('cLoc').value.trim(), note=$('cNote').value.trim();
+  if(start===null){ toast(T.tPickSlot); return; }
+  if(!loc){ toast(T.tTypeCourt2); return; }
+  if(start+l.dur>21){ toast(T.tLate); return; }
+  const clash=S.lessons.some(x=>x.id!==id && x.date===date && !(start+l.dur<=x.start || x.start+x.dur<=start));
+  if(clash){ toast(T.tTaken); return; }
+  if(isAdmin()){
+    l.date=date; l.start=start; l.location=loc; l.change=null;
+    save(); closeSheet(); selDate=date; toast(T.tMoved); render();
+  }else{
+    l.change={date,start,location:loc,note};
+    save(); closeSheet(); toast(T.tChangeSent); render();
+  }
+}
+function approveChange(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l||!l.change) return;
+  l.date=l.change.date; l.start=l.change.start; l.location=l.change.location; l.change=null;
+  save(); closeSheet(); toast(L().tChangeApproved); render();
+}
+function rejectChange(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  l.change=null; save(); closeSheet();
+  toast(isAdmin()?L().tKeepOriginal:L().tWithdrawn); render();
+}
+
+/* ---- confirm / decline / withdraw ---- */
+function confirmLesson(id){ const l=S.lessons.find(x=>x.id===id); if(!l) return; l.status='confirmed'; save(); closeSheet(); toast(L().tConfirmed); render(); }
+function rejectLesson(id){ S.lessons=S.lessons.filter(x=>x.id!==id); save(); closeSheet(); toast(L().tDeclined); render(); }
+function withdrawBooking(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  if(l.status!=='pending'){ toast(L().tNeedApproval); return; }
+  S.lessons=S.lessons.filter(x=>x.id!==id); save(); closeSheet(); toast(L().tWithdrawn2); render();
+}
+
+/* ---- cancel flow ---- */
+function openCancelSheet(id){
+  const T=L();
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  openSheet(
+    '<h3>'+T.cxlTitle+'</h3><p class="sub">'+dateLabel(l.date)+' · '+hh(l.start)+' · '+esc(l.location)+'<br>'+T.cxlSub+'</p>'
+    +'<label class="f-label" for="xNote">'+T.fReason+'</label><input class="f-input" id="xNote" placeholder="'+T.cxlReasonPh+'">'
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.keepIt+'</button>'
+    +'<button class="btn danger" onclick="submitCancel(\''+id+'\')">'+T.sendRequest+'</button></div>'
+  );
+}
+function submitCancel(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  l.cancelReq={note:$('xNote').value.trim()};
+  save(); closeSheet(); toast(L().tCxlSent); render();
+}
+function approveCancel(id){
+  S.lessons=S.lessons.filter(x=>x.id!==id);
+  save(); closeSheet(); toast(L().tCancelled); render();
+}
+function rejectCancel(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  l.cancelReq=null; save(); closeSheet();
+  toast(isAdmin()?L().tKept:L().tCxlWithdrawn); render();
+}
+function cancelByAdmin(id){
+  const T=L();
+  const l=S.lessons.find(x=>x.id===id); if(!l) return;
+  openSheet('<h3>'+T.admCxlTitle+'</h3><p class="sub">'+esc(stuName(l))+' · '+dateLabel(l.date)+' · '+hh(l.start)+'<br>'+T.admCxlSub+'</p>'
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.keepIt+'</button><button class="btn danger" onclick="approveCancel(\''+id+'\')">'+T.cancelSession+'</button></div>');
+}
+
+/* ---- settle ---- */
+function settleLesson(id){
+  const l=S.lessons.find(x=>x.id===id); if(!l||l.settled) return;
+  const st=stuOf(l); if(!st){ toast(L().tNoProfile); return; }
+  st.usedHours+=l.dur; l.settled=true;
+  save(); closeSheet(); toast(L().tSettled(l.dur, st.name, remaining(st))); render();
+}
+
+/* ---- players ---- */
+function openAddStudent(){
+  const T=L();
+  const code=String(Math.floor(1000+Math.random()*9000));
+  openSheet(
+    '<h3>'+T.npTitle+'</h3><p class="sub">'+T.npSub+'</p>'
+    +'<label class="f-label" for="nName">'+T.fName+'</label><input class="f-input" id="nName" placeholder="'+T.namePh+'" maxlength="14">'
+    +'<label class="f-label">'+T.fStartCredits+'</label><div class="chips" id="hrChips">'
+    +[10,20,30].map((n,i)=>'<button class="chip'+(i===1?' on':'')+'" onclick="pickHours('+n+',event)">'+n+'</button>').join('')
+    +'</div>'
+    +'<label class="f-label" for="nCode">'+T.fCode+'</label><input class="f-input" id="nCode" value="'+code+'" inputmode="numeric" maxlength="6">'
+    +'<label class="f-label" for="nNote">'+T.fNoteOpt+'</label><input class="f-input" id="nNote" placeholder="'+T.noteStuPh+'">'
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.cancel+'</button><button class="btn primary" onclick="submitStudent()">'+T.create+'</button></div>'
+  );
+}
+let _hours=20;
+function pickHours(n,ev){ _hours=n; document.querySelectorAll('#hrChips .chip').forEach(c=>c.classList.remove('on')); ev.currentTarget.classList.add('on'); }
+function submitStudent(){
+  const T=L();
+  const name=$('nName').value.trim(), code=$('nCode').value.trim(), note=$('nNote').value.trim();
+  if(!name){ toast(T.tNeedName); return; }
+  if(!/^\d{4,6}$/.test(code)){ toast(T.tBadCode); return; }
+  if(S.students.some(s=>s.code===code)){ toast(T.tCodeUsed); return; }
+  S.students.push({id:'s'+Date.now(), name, code, totalHours:_hours, usedHours:0, note});
+  save(); closeSheet(); toast(T.tPlayerAdded(name,code)); render();
+}
+function openStudent(id){
+  const T=L();
+  const s=S.students.find(x=>x.id===id); if(!s) return;
+  const up=S.lessons.filter(l=>l.studentId===id&&l.status==='confirmed'&&!isPast(l)).length;
+  openSheet(
+    '<h3>'+esc(s.name)+'</h3><p class="sub">'+T.spCode+s.code+(s.note?' · '+esc(s.note):'')+'</p>'
+    +'<div class="stat-grid" style="margin-top:4px">'
+    +'<div class="stat"><b>'+remaining(s)+'</b><span>'+T.statCreditsLeft+'</span></div>'
+    +'<div class="stat"><b>'+s.usedHours+'</b><span>'+T.statHoursDone+'</span></div>'
+    +'<div class="stat"><b>'+up+'</b><span>'+T.statUpcoming+'</span></div></div>'
+    +'<label class="f-label">'+T.topUp+'</label><div class="chips">'
+    +[4,10,20].map(n=>'<button class="chip" onclick="recharge(\''+id+'\','+n+')">＋'+n+'</button>').join('')+'</div>'
+    +'<div class="acts"><button class="btn danger" onclick="removeStudent(\''+id+'\')">'+T.remove+'</button><button class="btn" onclick="closeSheet()">'+T.close+'</button></div>'
+  );
+}
+function recharge(id,n){
+  const s=S.students.find(x=>x.id===id); if(!s) return;
+  s.totalHours+=n; save(); toast(L().tTopUp(n, s.name, remaining(s))); openStudent(id); renderHero();
+}
+function removeStudent(id){
+  const T=L();
+  const s=S.students.find(x=>x.id===id); if(!s) return;
+  const hasLessons=S.lessons.some(l=>l.studentId===id&&!isPast(l));
+  if(hasLessons){ toast(T.tHasUpcoming); return; }
+  openSheet('<h3>'+T.rmTitle(esc(s.name))+'</h3><p class="sub">'+T.rmSub+'</p>'
+    +'<div class="acts"><button class="btn" onclick="openStudent(\''+id+'\')">'+T.keep+'</button>'
+    +'<button class="btn danger" onclick="(function(){S.students=S.students.filter(x=>x.id!==\''+id+'\');save();closeSheet();toast(L().removed);render();})()">'+T.remove+'</button></div>');
+}
+
+/* ---- coach pin ---- */
+function openPinSheet(){
+  const T=L();
+  openSheet('<h3>'+T.pinTitle+'</h3><p class="sub">'+T.pinSub+'</p>'
+    +'<label class="f-label" for="pNew">'+T.fNewPin+'</label><input class="f-input" id="pNew" inputmode="numeric" maxlength="6" placeholder="'+T.pinPh+'">'
+    +'<div class="acts"><button class="btn" onclick="closeSheet()">'+T.cancel+'</button><button class="btn primary" onclick="savePin()">'+T.savePin+'</button></div>');
+}
+function savePin(){
+  const v=$('pNew').value.trim();
+  if(!/^\d{4,6}$/.test(v)){ toast(L().tBadPin); return; }
+  S.adminPin=v; save(); closeSheet(); toast(L().tPinSaved);
+}
+
+function resetDemo(){ if(CLOUD) return; localStorage.removeItem(KEY); S=seed(); S.session=null; selDate=todayStr(); calMode='week'; save(); boot(); toast(L().tDemoReset); }
+
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!$('login').classList.contains('hidden')) doLogin(); });
+
+(async function(){
+  if(CLOUD){ try{ await pullState(); }catch(e){ toast(L().serverFail); } }
+  boot();
+  if(CLOUD){
+    setInterval(async()=>{ if(!S.session) return; try{ await pullState(); render(); }catch(e){} }, 15000);
+    window.addEventListener('focus', async()=>{ try{ await pullState(); if(S.session) render(); }catch(e){} });
+  }
+})();
+</script>
