@@ -556,7 +556,7 @@ const EN={
   create:'Create',
   tNeedName:'Give the player a name', tBadCode:'Code must be 4–6 digits', tCodeUsed:'That code is already in use',
   tPlayerAdded:(n,c)=>n+' added — code '+c,
-  spCode:'Code ', topUp:'Top up', remove:'Remove', close:'Close',
+  spCode:'Code ', topUp:'Top up', topUpPh:'Custom amount', topUpBtn:'Add', tBadAmount:'Enter a number between 1 and 999', remove:'Remove', close:'Close',
   tHasUpcoming:'This player still has upcoming sessions',
   tTopUp:(n,name,left)=>'+'+n+' — '+name+' now has '+EN.credits(left),
   rmTitle:n=>'Remove '+n+'?', rmSub:'Their profile and credit history will be deleted. This can’t be undone.', keep:'Keep', removed:'Removed',
@@ -667,7 +667,7 @@ const ZH={
   create:'建档',
   tNeedName:'请填写学员姓名', tBadCode:'学员码需为 4–6 位数字', tCodeUsed:'这个学员码已被使用',
   tPlayerAdded:(n,c)=>'已为 '+n+' 建档，学员码 '+c,
-  spCode:'学员码 ', topUp:'充值课时', remove:'删除', close:'关闭',
+  spCode:'学员码 ', topUp:'充值课时', topUpPh:'自定义数量', topUpBtn:'充值', tBadAmount:'请输入 1–999 之间的数字', remove:'删除', close:'关闭',
   tHasUpcoming:'该学员还有未完成课程',
   tTopUp:(n,name,left)=>'已充值 '+n+'，'+name+' 剩余 '+left+' 课时',
   rmTitle:n=>'删除 '+n+'？', rmSub:'学员档案与课时记录将被删除，不可恢复。', keep:'保留', removed:'已删除',
@@ -1334,14 +1334,22 @@ function openStudent(id){
     +'<div class="stat"><b>'+remaining(s)+'</b><span>'+T.statCreditsLeft+'</span></div>'
     +'<div class="stat"><b>'+s.usedHours+'</b><span>'+T.statHoursDone+'</span></div>'
     +'<div class="stat"><b>'+up+'</b><span>'+T.statUpcoming+'</span></div></div>'
-    +'<label class="f-label">'+T.topUp+'</label><div class="chips">'
+    +'<label class="f-label">'+T.topUp+'</label><div class="chips" style="margin-bottom:9px">'
     +[4,10,20].map(n=>'<button class="chip" onclick="recharge(\''+id+'\','+n+')">＋'+n+'</button>').join('')+'</div>'
+    +'<div style="display:flex; gap:8px">'
+    +'<input class="f-input" id="topupAmt" type="number" min="1" max="999" inputmode="numeric" placeholder="'+T.topUpPh+'" style="flex:1" onkeydown="if(event.key===\'Enter\')rechargeCustom(\''+id+'\')">'
+    +'<button class="btn primary" style="flex:0 0 auto; padding:0 22px" onclick="rechargeCustom(\''+id+'\')">'+T.topUpBtn+'</button></div>'
     +'<div class="acts"><button class="btn danger" onclick="removeStudent(\''+id+'\')">'+T.remove+'</button><button class="btn" onclick="closeSheet()">'+T.close+'</button></div>'
   );
 }
 function recharge(id,n){
   const s=S.students.find(x=>x.id===id); if(!s) return;
   s.totalHours+=n; save(); toast(L().tTopUp(n, s.name, remaining(s))); openStudent(id); renderHero();
+}
+function rechargeCustom(id){
+  const v=parseInt(($('topupAmt').value||'').trim(),10);
+  if(!Number.isInteger(v) || v<1 || v>999){ toast(L().tBadAmount); return; }
+  recharge(id, v);
 }
 function removeStudent(id){
   const T=L();
