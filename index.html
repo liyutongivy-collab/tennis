@@ -337,6 +337,20 @@
   .balance-tip{display:flex; justify-content:space-between; align-items:center;
     background:var(--green-soft); border-radius:13px; padding:11px 14px; margin-top:15px; font-size:13.5px; font-weight:700; color:var(--green-2)}
 
+  #connErr{
+    position:fixed; inset:0; z-index:100; background:var(--paper);
+    display:flex; align-items:center; justify-content:center; padding:32px;
+  }
+  .conn-card{max-width:340px; text-align:center}
+  .conn-card .art{font-size:40px; margin-bottom:14px}
+  .conn-card h2{font-family:Georgia,"Songti SC",serif; font-weight:400; font-size:24px; margin:0 0 10px}
+  .conn-card p{font-size:14px; color:var(--muted); line-height:1.7; margin:0 0 22px}
+  .conn-card button{
+    border:none; border-radius:13px; padding:14px 44px; cursor:pointer;
+    background:var(--green); color:var(--green-ink); font-size:13px; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+  }
+  .conn-card button:disabled{opacity:.6}
+
   .toast{
     position:fixed; left:50%; bottom:118px; transform:translateX(-50%) translateY(8px);
     background:var(--ink); color:var(--paper); font-size:13px; font-weight:600;
@@ -345,6 +359,16 @@
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 </style>
+
+<!-- ================= CONNECTION ERROR ================= -->
+<div id="connErr" class="hidden">
+  <div class="conn-card">
+    <div class="art">🎾</div>
+    <h2 id="connTitle">Can’t reach the server</h2>
+    <p id="connSub">Your data is safe in the cloud — this device just couldn’t connect. Check your network and retry.</p>
+    <button id="connBtn" onclick="retryConn()">Retry</button>
+  </div>
+</div>
 
 <!-- ================= LOGIN ================= -->
 <div id="login" class="hidden">
@@ -472,6 +496,7 @@ const EN={
   hiCoach:'Welcome back, coach', hiPlayer:n=>'Welcome back, '+n,
   syncFail:'Sync failed — check your connection and retry',
   serverFail:'Could not reach the server — check your connection',
+  connTitle:'Can’t reach the server', connSub:'Your data is safe in the cloud — this device just couldn’t connect. Check your network (or switch Wi-Fi/4G) and retry.', connRetry:'Retry', connTrying:'Connecting…', notLoaded:'Not connected — changes can’t be saved yet',
   tabSchedule:'Schedule', tabInbox:'Inbox', tabPlayers:'Players', tabMe:'Me',
   fabBook:'Book', fabAdd:'Add', fabNewPlayer:'New player',
   eyebrowCoach:'Coach console', eyebrowStu:'Schedule',
@@ -583,6 +608,7 @@ const ZH={
   hiCoach:'欢迎回来，教练', hiPlayer:n=>'欢迎回来，'+n,
   syncFail:'同步失败——检查网络后重试',
   serverFail:'连不上服务器——检查一下网络',
+  connTitle:'连不上服务器', connSub:'数据都安全存在云端——只是这台设备暂时没连上。检查网络（或切换 Wi-Fi/流量）后重试。', connRetry:'重试', connTrying:'连接中…', notLoaded:'还没连上服务器，改动暂时无法保存',
   tabSchedule:'课表', tabInbox:'申请', tabPlayers:'学员', tabMe:'我的',
   fabBook:'约课', fabAdd:'加课', fabNewPlayer:'添加学员',
   eyebrowCoach:'教练台', eyebrowStu:'课表',
@@ -747,10 +773,11 @@ if(CLOUD){
 }
 try{ S.session=JSON.parse(localStorage.getItem(SESSION_KEY)) || S.session || null; }catch(e){}
 
-let _pushT=null, _dirty=false;
+let _pushT=null, _dirty=false, _loaded=false;
 function save(){
   localStorage.setItem(SESSION_KEY, JSON.stringify(S.session||null));
   if(!CLOUD){ localStorage.setItem(KEY, JSON.stringify(S)); return; }
+  if(!_loaded){ toast(L().notLoaded); return; } /* never overwrite cloud with unloaded (empty) state */
   _dirty=true;
   const body=JSON.stringify({data:{adminPin:S.adminPin, students:S.students, lessons:S.lessons}});
   clearTimeout(_pushT);
@@ -772,6 +799,29 @@ async function pullState(){
   S.adminPin=d.adminPin||ADMIN_PIN_DEFAULT;
   S.students=Array.isArray(d.students)?d.students:[];
   S.lessons=Array.isArray(d.lessons)?d.lessons:[];
+  _loaded=true;
+}
+async function pullWithRetry(tries){
+  for(let i=0;i<tries;i++){
+    try{ await pullState(); return true; }
+    catch(e){ await new Promise(r=>setTimeout(r, 800*(i+1))); }
+  }
+  return false;
+}
+function showConnErr(show){
+  const el=$('connErr'); if(!el) return;
+  el.classList.toggle('hidden',!show);
+  if(show){ const T=L();
+    $('connTitle').textContent=T.connTitle; $('connSub').textContent=T.connSub;
+    $('connBtn').textContent=T.connRetry;
+  }
+}
+async function retryConn(){
+  $('connBtn').textContent=L().connTrying; $('connBtn').disabled=true;
+  const ok=await pullWithRetry(3);
+  $('connBtn').disabled=false;
+  if(ok){ showConnErr(false); boot(); }
+  else{ $('connBtn').textContent=L().connRetry; toast(L().serverFail); }
 }
 
 let selDate=todayStr(), calMode='week', curTab='schedule', loginMode='student';
@@ -1379,11 +1429,12 @@ function resetDemo(){ if(CLOUD) return; localStorage.removeItem(KEY); S=seed(); 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!$('login').classList.contains('hidden')) doLogin(); });
 
 (async function(){
-  if(CLOUD){ try{ await pullState(); }catch(e){ toast(L().serverFail); } }
-  boot();
   if(CLOUD){
-    setInterval(async()=>{ if(!S.session) return; try{ await pullState(); render(); }catch(e){} }, 15000);
-    window.addEventListener('focus', async()=>{ try{ await pullState(); if(S.session) render(); }catch(e){} });
+    setInterval(async()=>{ if(!S.session||!_loaded) return; try{ await pullState(); render(); }catch(e){} }, 15000);
+    window.addEventListener('focus', async()=>{ if(!_loaded) return; try{ await pullState(); if(S.session) render(); }catch(e){} });
+    const ok=await pullWithRetry(3);
+    if(!ok){ applyLangStatic(); showConnErr(true); return; }
   }
+  boot();
 })();
 </script>
